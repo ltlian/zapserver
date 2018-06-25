@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package proto;
+
+service Subscription {
+	rpc Subscribe(stream SubscribeMessage) returns (stream NotificationMessage) {}
+}
+
+message SubscribeMessage {
+
+	uint32 RefreshRate = 1;
+
+	Statistics statistics = 2;
+
+	enum Statistics {
+		// If no 'Statistics' argument is provided, default is 0
+		// This can be expanded to allow for several options
+		SUMMARY = 0;
+		VIEWERCOUNT = 1;
+		AVGDURATIONS = 2;
+		SAMPLESIZE = 3;
+    }
+}
+
+message NotificationMessage {
+
+	string status = 1;
+
+	repeated Top10 top10 = 2;
+
+	message Top10 {
+		string channelName = 1;
+		uint32 viewcount = 2;
+		
+		// Could also return duration as a scalar (seconds, nanoseconds)
+		string avgDuration = 3;
+		
+		// Could return the whole log of zaps if the client wanted to calculate eg. variance and st. deviation, but
+		// would be very expensive.
+		uint32 sampleSize = 4;
+	}
+}
